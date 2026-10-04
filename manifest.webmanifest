@@ -1,0 +1,22 @@
+{
+  "name": "Крестики — учёт вышивки",
+  "short_name": "Крестики",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#0a84ff",
+  "description": "Ежедневный учёт крестиков (2025–2026), итоги за месяц и год, среднее за день. Работает офлайн.",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

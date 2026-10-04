@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a84ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Крестики" />
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+
+  <title>Крестики — учёт для вышивки</title>
+  <link rel="preload" href="./assets/fonts/DejaVuSans.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="./assets/fonts/DejaVuSans-Bold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="titleblock">
+        <h1>Крестики</h1>
+        <div class="subtitle">Учёт вышивки • 2025–2026</div>
+      </div>
+      <button class="icon-btn" id="installBtn" hidden>Установить</button>
+    </header>
+
+    <section class="card controls">
+      <div class="segmented" aria-label="Выбор года">
+        <button class="seg-btn" data-year="2025">2025</button>
+        <button class="seg-btn" data-year="2026">2026</button>
+      </div>
+
+      <div class="segmented tabs" aria-label="Раздел">
+        <button class="tab-btn" data-mode="calendar">Календарь</button>
+        <button class="tab-btn" data-mode="chart">График</button>
+      </div>
+
+      <div class="split-toggle-row" id="splitToggleRow" hidden>
+        <label class="switch">
+          <input type="checkbox" id="splitToggle" />
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+        <div class="split-text">
+          <div class="split-title">Split‑view</div>
+          <div class="split-subtitle">Показывать календарь и график одновременно (только на iPad в ландшафте)</div>
+        </div>
+      </div>
+
+      <div class="month-row" id="monthRow" aria-label="Выбор месяца">
+        <button class="nav-btn" id="prevMonth" aria-label="Предыдущий месяц">‹</button>
+        <div class="month-title" id="monthTitle">—</div>
+        <button class="nav-btn" id="nextMonth" aria-label="Следующий месяц">›</button>
+      </div>
+
+      <div class="month-row subtle" id="yearRow" hidden aria-label="График за год">
+        <div class="month-title" id="yearTitle">—</div>
+      </div>
+    </section>
+
+    <div class="content">
+      <section class="stats">
+      <div class="card stat">
+        <div class="label" id="stat1Label">За месяц</div>
+        <div class="value" id="monthTotal">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">За год</div>
+        <div class="value" id="yearTotal">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Среднее/день</div>
+        <div class="value" id="yearAvg">0</div>
+      </div>
+    </section>
+
+    <!-- Calendar / Chart container -->
+    <div class="right-split" id="rightSplit">
+      <section class="card calendar" id="calendarCard">
+      <div class="weekdays" aria-hidden="true">
+        <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+      </div>
+      <div class="days" id="calendarGrid" aria-label="Календарь"></div>
+      <div class="hint">Нажмите на день, чтобы внести количество. Если не внесено — считается 0.</div>
+    </section>
+
+      <!-- Chart -->
+      <section class="card chart" id="chartCard" hidden>
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">График по месяцам</div>
+          <div class="chart-subtitle" id="chartYearLabel">—</div>
+        </div>
+        <button class="icon-btn" id="openMonths" type="button">Месяцы</button>
+      </div>
+      <canvas id="monthChart" class="chart-canvas" width="720" height="280" aria-label="График по месяцам"></canvas>
+      <div class="chart-hint">Нажмите на столбец или месяц в списке, чтобы открыть календарь этого месяца.</div>
+</section>
+    </div>
+
+    <section class="actions">
+      <button class="ghost" id="exportBtn">Экспорт данных</button>
+      <label class="ghost file">
+        Импорт
+        <input type="file" id="importFile" accept="application/json" hidden />
+      </label>
+      <button class="ghost danger" id="clearYearBtn">Очистить выбранный год</button>
+    </section>
+    </div>
+
+    <footer class="footer">
+      Данные хранятся локально в браузере (на устройстве). Для резервной копии используйте экспорт.
+    </footer>
+  </main>
+
+  <!-- Bottom sheet -->
+  <div class="sheet" id="editSheet" hidden>
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Ввод за день">
+      <div class="sheet-header">
+        <div class="sheet-title" id="sheetDateTitle">—</div>
+        <button class="icon-btn" id="closeSheet">Закрыть</button>
+      </div>
+      <div class="sheet-body">
+        <label class="field">
+          <span>Крестики за день</span>
+          <input id="dayInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0" />
+        </label>
+        <div class="sheet-actions">
+          <button class="primary" id="saveDay">Сохранить</button>
+          <button class="ghost" id="clearDay">Сбросить (0)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Months sheet -->
+  <div class="sheet" id="monthsSheet" hidden>
+    <div class="sheet-backdrop" id="monthsBackdrop"></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Месяцы">
+      <div class="sheet-header">
+        <div class="sheet-title" id="monthsTitle">Месяцы</div>
+        <button class="icon-btn" id="closeMonths" type="button">Закрыть</button>
+      </div>
+      <div class="sheet-body">
+        <div class="month-list" id="monthList" aria-label="Итоги по месяцам"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="./app.js"></script>
+</body>
+</html>
